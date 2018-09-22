@@ -5,6 +5,7 @@ dist/
 nbdist/
 .nb-gradle/
 
+config.inc.php
 composer.phar
 /vendor/
 
