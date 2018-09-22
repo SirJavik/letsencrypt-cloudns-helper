@@ -102,6 +102,28 @@ class ClouDNS {
         return $content;
     }
     
+    public function isUpdated($domainName) {
+        global $config;
+        
+        $url = "https://api.cloudns.net/dns/is-updated.json";
+        $postRequest = [
+            'auth-id'       => $config['ClouDNS']['auth-id'],
+            'auth-password' => $config['ClouDNS']['auth-password'],
+            'domain-name'   => $domainName
+        ];
+        
+        $curl = curl_init($url);
+        
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_USERAGENT, 'libClouDNS v1.0.0 (https://javik.net)');
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $postRequest);
+        
+        $content = curl_exec($curl); 
+        
+        return $content;
+    }
+    
     public function createRecord($domainName, $recordType, $host, $record, $ttl = 3600) {
         global $config;
         
@@ -124,8 +146,12 @@ class ClouDNS {
         curl_setopt($curl, CURLOPT_USERAGENT, 'libClouDNS v1.0.0 (https://javik.net)');
         curl_setopt($curl, CURLOPT_POSTFIELDS, $postRequest);
         
-        $content = curl_exec($curl); 
+        $content = json_decode(curl_exec($curl),true); 
         
-        return $content;
+        if($content['status']=='Success') {
+            return true;
+        }
+        
+        return false;
     }
 }

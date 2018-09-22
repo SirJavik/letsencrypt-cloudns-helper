@@ -42,6 +42,10 @@ class LECDH {
         
     }
     
+    public function echo($message) {
+        echo "[LECDH] ",$message,PHP_EOL;
+    }
+    
     public function getVersion() {
         $vmajor = 1;
         $vminor = 0;

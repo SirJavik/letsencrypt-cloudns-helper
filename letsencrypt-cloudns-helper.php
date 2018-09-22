@@ -42,7 +42,7 @@ $validationString   = getenv("CERTBOT_VALIDATION");
 
 foreach ($argv as $argument) {
     if($argument == '-v' or $argument == '--version') {
-        echo 'letsencrypt-cloudns-helper v', $lecdh->getVersion(), PHP_EOL;
+        $lecdh->echo('letsencrypt-cloudns-helper v'.$lecdh->getVersion());
         return 0;
         
     } elseif($argument == '-h' or $argument == '--help') {
@@ -50,7 +50,9 @@ foreach ($argv as $argument) {
         return 0;
         
     } elseif($argument == '--auth') {
-        echo $cloudns->createRecord($domainName, 'TXT', '_acme-challenge', $validationString);
+        if(!$cloudns->createRecord($domainName, 'TXT', '_acme-challenge', $validationString)) {
+            
+        }
         sleep(300);
         return 0;
         
@@ -60,6 +62,25 @@ foreach ($argv as $argument) {
         foreach($records as $record) {
             echo $cloudns->deleteRecord($domainName, $record['id']), PHP_EOL;
         }
-    } 
+    } elseif ($argument == '--test') {
+        echo $cloudns->isUpdated('javik.net'), PHP_EOL;
+        
+        echo $cloudns->createRecord('javik.net', 'TXT', '_test', "Test"), PHP_EOL;
+        
+        $end = false;
+        $count = 1;
+        
+        while(!$end) {
+            $lecdh->echo("Waitig for ClouDNS to become updated... [$count]");    
+            if($cloudns->isUpdated('javik.net')=="true") {
+                $lecdh->echo("ClouDNS is updated. [$count tries]");   
+                $end = true;
+                break;
+            }
+            $count++;
+            sleep(30);
+            
+        }
+    }
 }
 
