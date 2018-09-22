@@ -28,7 +28,7 @@
 
 $config = [
   'ClouDNS' => [
-      'auth-id'         => 2110,
-      'auth-password'   => "VSSw}4jMz$7gJK6vvCHu_f@+DYL{Nen("
+      'auth-id'         => 0,
+      'auth-password'   => ""
   ]  
 ];
