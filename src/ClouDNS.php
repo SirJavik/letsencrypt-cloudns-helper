@@ -45,10 +45,14 @@ class ClouDNS {
         }
     }
     
-    public function __destruct() {
-        ;
-    }
-    
+    /**
+     * Lists ClouDNS Records for a domain
+     * @global array $config
+     * @param string $domainName
+     * @param string $type
+     * @param string $host
+     * @return string
+     */
     public function listRecords($domainName, $type = null, $host = null) {
         global $config;
         
@@ -80,6 +84,14 @@ class ClouDNS {
         return $content;
     }
     
+    /**
+     * Deletes an ClouDNS record
+     * 
+     * @global array $config
+     * @param string $domainName
+     * @param int $recordID
+     * @return boolean
+     */
     public function deleteRecord($domainName, $recordID) {
         global $config;
         
@@ -102,6 +114,12 @@ class ClouDNS {
         return $content;
     }
     
+    /**
+     * Checks if ClouDNS has finished updating
+     * @global array $config
+     * @param string $domainName
+     * @return string
+     */
     public function isUpdated($domainName) {
         global $config;
         
@@ -120,10 +138,20 @@ class ClouDNS {
         curl_setopt($curl, CURLOPT_POSTFIELDS, $postRequest);
         
         $content = curl_exec($curl); 
-        
+  
         return $content;
     }
     
+    /**
+     * Creates an ClouDNS Record
+     * @global array $config
+     * @param string $domainName
+     * @param string $recordType
+     * @param string $host
+     * @param string $record
+     * @param int $ttl
+     * @return boolean
+     */
     public function createRecord($domainName, $recordType, $host, $record, $ttl = 3600) {
         global $config;
         
@@ -151,7 +179,6 @@ class ClouDNS {
         if($content['status']=='Success') {
             return true;
         }
-        
         return false;
     }
 }

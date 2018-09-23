@@ -33,6 +33,8 @@ require(__DIR__.'/config.inc.php');
 
 use lecdh\ClouDNS;
 use lecdh\LECDH;
+use lecdh\Exception\RecordNotCreatedException;
+use lecdh\Exception\RecordNotDeletedException;
 
 $cloudns = new ClouDNS();
 $lecdh   = new LECDH();
@@ -50,29 +52,22 @@ foreach ($argv as $argument) {
         return 0;
         
     } elseif($argument == '--auth') {
-        if(!$cloudns->createRecord($domainName, 'TXT', '_acme-challenge', $validationString)) {
-            
+        try {
+            if(!$cloudns->createRecord($domainName, 'TXT', '_acme-challenge', $validationString)) {
+                throw new RecordNotCreatedException();
+            }
+        } catch (RecordNotCreatedException $e) {
+            echo $e->getMessage(), PHP_EOL;
+            die();
         }
-        sleep(300);
-        return 0;
-        
-    } elseif ($argument == '--cleanup') {
-        $records = json_decode($cloudns->listRecords($domainName, 'TXT', '_acme-challenge'), true);
-        
-        foreach($records as $record) {
-            echo $cloudns->deleteRecord($domainName, $record['id']), PHP_EOL;
-        }
-    } elseif ($argument == '--test') {
-        echo $cloudns->isUpdated('javik.net'), PHP_EOL;
-        
-        echo $cloudns->createRecord('javik.net', 'TXT', '_test', "Test"), PHP_EOL;
+        $lecdh->echo("TXT DNS Record for Domain $domainName with host _acme-challenge which contains \"$validationString\" has been created sucessfully");
         
         $end = false;
         $count = 1;
         
         while(!$end) {
             $lecdh->echo("Waitig for ClouDNS to become updated... [$count]");    
-            if($cloudns->isUpdated('javik.net')=="true") {
+            if($cloudns->isUpdated($domainName)=="true") {
                 $lecdh->echo("ClouDNS is updated. [$count tries]");   
                 $end = true;
                 break;
@@ -81,6 +76,23 @@ foreach ($argv as $argument) {
             sleep(30);
             
         }
+        return 0;
+        
+    } elseif ($argument == '--cleanup') {
+        $records = json_decode($cloudns->listRecords($domainName, 'TXT', '_acme-challenge'), true);
+        
+        
+        foreach($records as $record) {
+            try {
+                if(!$cloudns->deleteRecord($domainName, $record['id'])) {
+                    throw new RecordNotDeletedException();
+                }
+            } catch (RecordNotCreatedException $e) {
+                echo $e->getMessage(), PHP_EOL;
+                die();
+            }
+                $lecdh->echo("TXT DNS Record for Domain $domainName with host _acme-challenge which contains \"$validationString\" has been deleted sucessfully");
+            }
     }
 }
 
