@@ -39,7 +39,13 @@ class LECDH {
     }
     
     public function getHelp() {
-        
+        echo 'Usage: letsencrypt-cloudns-helper [Option]', PHP_EOL, PHP_EOL;
+        echo 'Options:', PHP_EOL;
+        echo '-h, --help    -   Prints this information', PHP_EOL;
+        echo '-v, --version -   Returns version information of the script', PHP_EOL;
+        echo '--auth        -   Runs the authentification hook:', PHP_EOL;
+        echo '--cleanup     -   Runs the cleanup hook:', PHP_EOL;
+        return 0;
     }
     
     public function echo($message) {
